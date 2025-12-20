@@ -58,7 +58,7 @@ We welcome contributions to Aabo! If you'd like to contribute, please follow the
 
 ## Contact
 
-For any inquiries or support, please contact us at [support@aabo.rw](mailto:contact@coodic.org).
+For any inquiries or support, please contact us at [contact@coodic.org](mailto:contact@coodic.org).
 
 ---
 
