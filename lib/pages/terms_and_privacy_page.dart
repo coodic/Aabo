@@ -1,46 +1,19 @@
 import 'package:flutter/material.dart';
 
 class TermsAndPrivacyPage extends StatefulWidget {
-  final VoidCallback onAccepted;
-  const TermsAndPrivacyPage({Key? key, required this.onAccepted}) : super(key: key);
+  const TermsAndPrivacyPage({super.key});
 
   @override
   State<TermsAndPrivacyPage> createState() => _TermsAndPrivacyPageState();
 }
 
-class _TermsAndPrivacyPageState extends State<TermsAndPrivacyPage> with SingleTickerProviderStateMixin {
+class _TermsAndPrivacyPageState extends State<TermsAndPrivacyPage> {
   bool _accepted = false;
-  late AnimationController _controller;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-
-    _fadeAnimation = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeIn,
-    );
-
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOut,
-    ));
-
-    _controller.forward();
-  }
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void dispose() {
-    _controller.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -49,116 +22,154 @@ class _TermsAndPrivacyPageState extends State<TermsAndPrivacyPage> with SingleTi
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         elevation: 0,
-        backgroundColor: Colors.transparent,
-        iconTheme: const IconThemeData(color: Colors.black),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black87),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: const Text(
-          'Terms & Privacy',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          "Terms & Privacy",
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Serif',
+          ),
         ),
         centerTitle: true,
       ),
       body: SafeArea(
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: SlideTransition(
-            position: _slideAnimation,
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.security,
-                        size: 64,
-                        color: Colors.blue,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  const Text(
-                    'Please review our terms',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'Read our privacy policy and terms of service carefully before using the application.',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                      height: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[50],
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey[200]!),
-                      ),
-                      child: const SingleChildScrollView(
-                        child: Text(
-                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nDuis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\n(This is where your actual terms and privacy policy text would go. You can load this from a file or an API.)',
-                          style: TextStyle(fontSize: 14, height: 1.6),
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header Icon
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF00B0FF).withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.gavel_rounded,
+                          size: 48,
+                          color: Color(0xFF00B0FF),
                         ),
                       ),
                     ),
+                    const SizedBox(height: 24),
+                    
+                    const Text(
+                      "Terms of Service",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      "Last updated: December 2025",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    
+                    _buildSection("1. Introduction", "Welcome to AABO. By using our app, you agree to these terms. Please read them carefully."),
+                    _buildSection("2. User Accounts", "You are responsible for maintaining the confidentiality of your account and password. You agree to accept responsibility for all activities that occur under your account."),
+                    _buildSection("3. Ride Services", "AABO connects you with independent drivers. We are not a transportation carrier. We do not guarantee the availability of rides at all times."),
+                    _buildSection("4. Payments", "You agree to pay for all rides booked through the app. Payments are processed securely through our payment partners."),
+                    _buildSection("5. Privacy Policy", "We collect and use your personal data as described in our Privacy Policy. This includes location data to provide the service."),
+                    _buildSection("6. Safety", "We prioritize safety. Any abusive behavior towards drivers or other passengers will result in immediate account suspension."),
+                    
+                    const SizedBox(height: 40),
+                  ],
+                ),
+              ),
+            ),
+            
+            // Bottom Action Area
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, -5),
                   ),
-                  const SizedBox(height: 24),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: _accepted ? Colors.blue.withOpacity(0.1) : Colors.transparent,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: _accepted ? Colors.blue : Colors.grey[300]!,
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      SizedBox(
+                        height: 24,
+                        width: 24,
+                        child: Checkbox(
+                          value: _accepted,
+                          activeColor: const Color(0xFF00B0FF),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          onChanged: (value) {
+                            setState(() {
+                              _accepted = value ?? false;
+                            });
+                          },
+                        ),
                       ),
-                    ),
-                    child: CheckboxListTile(
-                      activeColor: Colors.blue,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _accepted = !_accepted;
+                            });
+                          },
+                          child: Text(
+                            "I agree to the Terms of Service and Privacy Policy",
+                            style: TextStyle(
+                              color: Colors.grey[800],
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
                       ),
-                      title: const Text(
-                        'I accept the Terms and Privacy Policy',
-                        style: TextStyle(fontWeight: FontWeight.w500),
-                      ),
-                      value: _accepted,
-                      onChanged: (bool? value) {
-                        setState(() {
-                          _accepted = value ?? false;
-                        });
-                      },
-                    ),
+                    ],
                   ),
                   const SizedBox(height: 24),
                   SizedBox(
                     width: double.infinity,
                     height: 56,
                     child: ElevatedButton(
-                      onPressed: _accepted ? widget.onAccepted : null,
+                      onPressed: _accepted 
+                          ? () => Navigator.of(context).pop(true) 
+                          : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        foregroundColor: Colors.white,
+                        backgroundColor: const Color(0xFFE6A100), // Mustard/Orange
+                        foregroundColor: Colors.black,
+                        disabledBackgroundColor: Colors.grey[200],
+                        disabledForegroundColor: Colors.grey[400],
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        disabledBackgroundColor: Colors.grey[300],
                       ),
                       child: const Text(
-                        'Continue',
+                        "Accept & Continue",
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -169,8 +180,36 @@ class _TermsAndPrivacyPageState extends State<TermsAndPrivacyPage> with SingleTi
                 ],
               ),
             ),
-          ),
+          ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSection(String title, String content) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            content,
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[700],
+              height: 1.5,
+            ),
+          ),
+        ],
       ),
     );
   }

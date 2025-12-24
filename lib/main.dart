@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'pages/OnBoardScreen.dart';
+import 'pages/onboarding_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,7 +13,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'AABO Ride',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF00B0FF),
+          primary: const Color(0xFF00B0FF),
+        ),
+        useMaterial3: true,
       ),
       home: const OnBoardScreen(),
     );
