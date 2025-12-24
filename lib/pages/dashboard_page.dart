@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'choosing_location_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -363,7 +364,12 @@ class _DashboardPageState extends State<DashboardPage> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {},
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ChoosingLocationPage()),
+            );
+          },
           borderRadius: BorderRadius.circular(20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
