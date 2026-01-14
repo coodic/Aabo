@@ -21,10 +21,15 @@ class _ChoosingLocationPageState extends State<ChoosingLocationPage> {
       body: Stack(
         children: [
           // Map Background
-          const GoogleMap(
-            initialCameraPosition: _kigali,
-            myLocationButtonEnabled: false,
-            zoomControlsEnabled: false,
+          Positioned.fill(
+            child: GoogleMap(
+              initialCameraPosition: _kigali,
+              myLocationButtonEnabled: false,
+              zoomControlsEnabled: false,
+              onMapCreated: (GoogleMapController controller) {
+                debugPrint("Google Map Created");
+              },
+            ),
           ),
 
           // Back Button
@@ -157,11 +162,11 @@ class _ChoosingLocationPageState extends State<ChoosingLocationPage> {
           Expanded(
             child: Text(
               text,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
                 color: Colors.black87,
-                overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
