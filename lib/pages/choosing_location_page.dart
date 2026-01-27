@@ -19,59 +19,60 @@ class _ChoosingLocationPageState extends State<ChoosingLocationPage> {
 
   final Completer<GoogleMapController> _controller = Completer();
   Set<Marker> _markers = {};
+  bool _fetchingLocation = false; // Add a flag to prevent overlapping calls
 
   Future<void> _getCurrentLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
+    if (_fetchingLocation) return; // Prevent overlapping calls
+    _fetchingLocation = true;
 
-    // Check if location services are enabled
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      debugPrint('Location services are disabled.');
-      return;
-    }
-
-    // Check for location permissions
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        debugPrint('Location permissions are denied.');
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        debugPrint('Location services are disabled.');
         return;
       }
-    }
 
-    if (permission == LocationPermission.deniedForever) {
-      debugPrint('Location permissions are permanently denied.');
-      return;
-    }
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          debugPrint('Location permissions are denied.');
+          return;
+        }
+      }
 
-    // Get the current position
-    final position = await Geolocator.getCurrentPosition();
-    debugPrint('Current location: ${position.latitude}, ${position.longitude}');
+      if (permission == LocationPermission.deniedForever) {
+        debugPrint('Location permissions are permanently denied.');
+        return;
+      }
 
-    // Update the map camera position
-    final GoogleMapController controller = await _controller.future;
-    controller.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(
-          target: LatLng(position.latitude, position.longitude),
-          zoom: 14.4746,
-        ),
-      ),
-    );
+      final position = await Geolocator.getCurrentPosition();
+      debugPrint('Current location: ${position.latitude}, ${position.longitude}');
 
-    // Add a marker for the current location
-    setState(() {
-      _markers.clear();
-      _markers.add(
-        Marker(
-          markerId: MarkerId('current-location'),
-          position: LatLng(position.latitude, position.longitude),
-          infoWindow: InfoWindow(title: 'Your Location'),
+      final GoogleMapController controller = await _controller.future;
+      controller.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: LatLng(position.latitude, position.longitude),
+            zoom: 14.4746,
+          ),
         ),
       );
-    });
+
+      setState(() {
+        _markers = {
+          Marker(
+            markerId: const MarkerId('current-location'),
+            position: LatLng(position.latitude, position.longitude),
+            infoWindow: const InfoWindow(title: 'Your Location'),
+          ),
+        };
+      });
+    } catch (e) {
+      debugPrint('Error fetching location: $e');
+    } finally {
+      _fetchingLocation = false;
+    }
   }
 
   @override

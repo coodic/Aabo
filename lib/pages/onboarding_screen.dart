@@ -75,10 +75,10 @@ class _OnBoardScreenState extends State<OnBoardScreen> {
                 padding: const EdgeInsets.all(16.0),
                 child: TextButton(
                   onPressed: _navigateToTerms,
-                  child: Text(
+                  child: const Text(
                     "Skip",
                     style: TextStyle(
-                      color: Colors.grey[600],
+                      color: Colors.grey,
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -86,7 +86,7 @@ class _OnBoardScreenState extends State<OnBoardScreen> {
                 ),
               ),
             ),
-            
+
             // Page Content
             Expanded(
               child: PageView.builder(
@@ -107,7 +107,7 @@ class _OnBoardScreenState extends State<OnBoardScreen> {
                         Container(
                           padding: const EdgeInsets.all(30),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF00B0FF).withValues(alpha: 0.1),
+                            color: const Color(0xFF00B0FF).withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
                           child: _contents[index].image != null
@@ -130,16 +130,15 @@ class _OnBoardScreenState extends State<OnBoardScreen> {
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
-                            fontFamily: 'Serif',
                           ),
                         ),
                         const SizedBox(height: 20),
                         Text(
                           _contents[index].description,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
-                            color: Colors.grey[600],
+                            color: Colors.grey,
                             height: 1.5,
                           ),
                         ),
@@ -166,8 +165,8 @@ class _OnBoardScreenState extends State<OnBoardScreen> {
                         height: 8,
                         width: _currentPage == index ? 24 : 8,
                         decoration: BoxDecoration(
-                          color: _currentPage == index 
-                              ? const Color(0xFF00B0FF) 
+                          color: _currentPage == index
+                              ? const Color(0xFF00B0FF)
                               : Colors.grey[300],
                           borderRadius: BorderRadius.circular(4),
                         ),
@@ -175,7 +174,7 @@ class _OnBoardScreenState extends State<OnBoardScreen> {
                     ),
                   ),
                   const SizedBox(height: 32),
-                  
+
                   // Action Button
                   SizedBox(
                     width: double.infinity,
@@ -215,9 +214,9 @@ class OnboardingContent {
   final IconData icon;
   final String? image;
 
-  OnboardingContent({
-    required this.title, 
-    required this.description, 
+  const OnboardingContent({
+    required this.title,
+    required this.description,
     required this.icon,
     this.image,
   });
