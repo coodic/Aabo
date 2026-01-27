@@ -1,7 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'pages/onboarding_screen.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart' as dotenv;
 
-void main() {
+Future<void> main() async {
+  print("Current Directory: \\${Directory.current.path}"); // Debug current directory
+  await dotenv.dotenv.load(fileName: ".env"); // Explicitly load .env file
   runApp(const MyApp());
 }
 
