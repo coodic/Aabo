@@ -29,6 +29,11 @@ class _ChoosingLocationPageState extends State<ChoosingLocationPage> {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         debugPrint('Location services are disabled.');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+             const SnackBar(content: Text('Location services are disabled. Please enable them.')),
+          );
+        }
         return;
       }
 
@@ -37,12 +42,22 @@ class _ChoosingLocationPageState extends State<ChoosingLocationPage> {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
           debugPrint('Location permissions are denied.');
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Location permissions are denied.')),
+            );
+          }
           return;
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
         debugPrint('Location permissions are permanently denied.');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Location permissions are permanently denied. Please enable them in settings.')),
+          );
+        }
         return;
       }
 
@@ -84,6 +99,7 @@ class _ChoosingLocationPageState extends State<ChoosingLocationPage> {
           Positioned.fill(
             child: GoogleMap(
               initialCameraPosition: _kigali,
+              myLocationEnabled: true,
               myLocationButtonEnabled: false,
               zoomControlsEnabled: false,
               markers: _markers,
