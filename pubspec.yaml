@@ -41,6 +41,9 @@ dependencies:
   firebase_messaging: ^16.1.0
   intl_phone_field: ^3.2.0
   flutter_dotenv: ^6.0.0
+  flutter_typeahead: ^5.2.0
+  http: ^1.6.0
+  uuid: ^4.5.2
   # stripe_payment: ^1.1.4
 
 dev_dependencies:
