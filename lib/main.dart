@@ -9,6 +9,14 @@ Future<void> main() async {
   try {
     await dotenv.dotenv.load(fileName: ".env"); // Explicitly load .env file
     print("Environment variables loaded successfully.");
+
+    // Debugging: Log the API key
+    final apiKey = dotenv.dotenv.env['API_KEY'];
+    if (apiKey == null || apiKey.isEmpty) {
+      print("API_KEY is missing or empty in the .env file.");
+    } else {
+      print("Loaded API_KEY: $apiKey");
+    }
   } catch (e) {
     print("Failed to load .env file: $e");
   }
