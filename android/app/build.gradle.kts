@@ -13,11 +13,11 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-        options.compilerArgs.add("-Xlint:-options")
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+        freeCompilerArgs = listOf("-Xlint:-options") // Add compiler arguments here
+        jvmTarget = "17" // Use the updated syntax
     }
 
     defaultConfig {
