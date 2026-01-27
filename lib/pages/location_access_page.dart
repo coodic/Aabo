@@ -17,12 +17,12 @@ class _LocationAccessPageState extends State<LocationAccessPage> {
       _isLoading = true;
     });
 
+    debugPrint("Requesting location services...");
+
     // Check if location services are enabled.
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    debugPrint("Location services enabled: $serviceEnabled");
     if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the 
-      // App to enable the location services.
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Location services are disabled. Please enable them.')),
@@ -34,15 +34,13 @@ class _LocationAccessPageState extends State<LocationAccessPage> {
       return;
     }
 
+    debugPrint("Checking location permissions...");
     LocationPermission permission = await Geolocator.checkPermission();
+    debugPrint("Initial permission status: $permission");
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
+      debugPrint("Permission after request: $permission");
       if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale 
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Location permissions are denied')),
@@ -54,9 +52,9 @@ class _LocationAccessPageState extends State<LocationAccessPage> {
         return;
       }
     }
-    
+
     if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately. 
+      debugPrint("Permission permanently denied.");
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Location permissions are permanently denied, we cannot request permissions.')),
@@ -66,18 +64,16 @@ class _LocationAccessPageState extends State<LocationAccessPage> {
         });
       }
       return;
-    } 
+    }
 
-    // When we reach here, permissions are granted and we can
-    // continue accessing the position of the device.
-    
+    debugPrint("Permissions granted. Navigating to LoadingSplashPage...");
     if (mounted) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const LoadingSplashPage()),
       );
     }
-    
+
     setState(() {
       _isLoading = false;
     });
