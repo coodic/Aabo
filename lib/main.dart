@@ -5,7 +5,14 @@ import 'package:flutter_dotenv/flutter_dotenv.dart' as dotenv;
 
 Future<void> main() async {
   print("Current Directory: \\${Directory.current.path}"); // Debug current directory
-  await dotenv.dotenv.load(fileName: ".env"); // Explicitly load .env file
+
+  try {
+    await dotenv.dotenv.load(fileName: ".env"); // Explicitly load .env file
+    print("Environment variables loaded successfully.");
+  } catch (e) {
+    print("Failed to load .env file: $e");
+  }
+
   runApp(const MyApp());
 }
 
