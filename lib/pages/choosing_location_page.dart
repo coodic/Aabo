@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
 import 'package:geolocator/geolocator.dart';
+import '../services/places_service.dart';
 
 class ChoosingLocationPage extends StatefulWidget {
   const ChoosingLocationPage({super.key});
