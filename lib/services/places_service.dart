@@ -1,7 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages
 
-import 'package:flutter/material.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
+
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:uuid/uuid.dart';
@@ -50,6 +50,99 @@ class PlaceApiProvider {
       throw Exception('Failed to fetch suggestion');
     }
   }
+
+  Future<Map<String, dynamic>> getDirections(double startLat, double startLng, double endLat, double endLng) async {
+    const String url = 'https://routes.googleapis.com/directions/v2:computeRoutes';
+    
+    final body = json.encode({
+      "origin": {
+        "location": {
+          "latLng": {
+            "latitude": startLat,
+            "longitude": startLng
+          }
+        }
+      },
+      "destination": {
+        "location": {
+          "latLng": {
+            "latitude": endLat,
+            "longitude": endLng
+          }
+        }
+      },
+      "travelMode": "TWO_WHEELER",
+      "routingPreference": "TRAFFIC_AWARE",
+      "computeAlternativeRoutes": false,
+      "routeModifiers": {
+        "avoidTolls": false,
+        "avoidHighways": false,
+        "avoidFerries": false
+      },
+      "languageCode": "en-US",
+      "units": "METRIC"
+    });
+
+    final response = await client.post(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': apiKey,
+        'X-Goog-FieldMask': 'routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline'
+      },
+      body: body,
+    );
+
+    if (response.statusCode == 200) {
+      final result = json.decode(response.body);
+      if (result['routes'] != null && (result['routes'] as List).isNotEmpty) {
+        final route = result['routes'][0];
+        final distance = route['distanceMeters'];
+        final duration = route['duration']; 
+        final encodedPolyline = route['polyline']['encodedPolyline'];
+
+        return {
+          'distance': distance,
+          'duration': duration,
+          'points': _decodePolyline(encodedPolyline),
+        };
+      }
+      throw Exception('No routes found');
+    } else {
+      throw Exception('Failed to fetch directions: ${response.body}');
+    }
+  }
+
+  List<LatLng> _decodePolyline(String encoded) {
+    List<LatLng> poly = [];
+    int index = 0, len = encoded.length;
+    int lat = 0, lng = 0;
+
+    while (index < len) {
+      int b, shift = 0, result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      lat += dlat;
+
+      shift = 0;
+      result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      lng += dlng;
+
+      final p = LatLng((lat / 1E5).toDouble(), (lng / 1E5).toDouble());
+      poly.add(p);
+    }
+    return poly;
+  }
 }
 
 class Suggestion {
@@ -67,79 +160,4 @@ class PlaceDetail {
   PlaceDetail(this.name, this.lat, this.lng);
 }
 
-class AddressSearch extends SearchDelegate<Suggestion?> {
-  final sessionToken = const Uuid().v4();
-  PlaceApiProvider apiClient = PlaceApiProvider();
 
-  AddressSearch();
-
-  @override
-  List<Widget> buildActions(BuildContext context) {
-    return [
-      IconButton(
-        tooltip: 'Clear',
-        icon: const Icon(Icons.clear),
-        onPressed: () {
-          query = '';
-        },
-      )
-    ];
-  }
-
-  @override
-  Widget buildLeading(BuildContext context) {
-    return IconButton(
-      tooltip: 'Back',
-      icon: const Icon(Icons.arrow_back),
-      onPressed: () {
-        close(context, null);
-      },
-    );
-  }
-
-  @override
-  Widget buildResults(BuildContext context) {
-    return Container(); // No separate results page needed for autocomplete
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    return FutureBuilder<List<Suggestion>>(
-      future: query.isEmpty
-          ? Future.value([])
-          : apiClient.fetchSuggestions(query, Localizations.localeOf(context).languageCode),
-      builder: (context, snapshot) {
-        if (query.isEmpty) {
-          return Container(
-            padding: const EdgeInsets.all(16.0),
-            child: const Text('Enter your address'),
-          );
-        }
-
-        if (snapshot.hasError) {
-          return Container(
-            padding: const EdgeInsets.all(16.0),
-            child: Text('Error: ${snapshot.error}'),
-          );
-        }
-
-        if (snapshot.connectionState == ConnectionState.waiting) {
-           return Container(
-            padding: const EdgeInsets.all(16.0),
-            child: const Text('Loading...'),
-          );
-        }
-
-        return ListView.builder(
-          itemBuilder: (context, index) => ListTile(
-            title: Text((snapshot.data![index]).description),
-            onTap: () {
-              close(context, snapshot.data![index]);
-            },
-          ),
-          itemCount: snapshot.data!.length,
-        );
-      },
-    );
-  }
-}
