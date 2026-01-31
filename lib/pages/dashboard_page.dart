@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'choosing_location_page.dart';
+import 'history_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -408,10 +409,20 @@ class _DashboardPageState extends State<DashboardPage> {
             color: isActive ? _primaryBlue : Colors.grey[200],
             shape: BoxShape.circle,
           ),
-          child: Icon(
-            icon,
-            color: isActive ? Colors.white : Colors.black54,
-            size: isActive ? 30 : 24,
+          child: InkWell(
+            onTap: () {
+              if (label == "History") {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HistoryPage()),
+                );
+              }
+            },
+            child: Icon(
+              icon,
+              color: isActive ? Colors.white : Colors.black54,
+              size: isActive ? 30 : 24,
+            ),
           ),
         ),
         const SizedBox(height: 4),
